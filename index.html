@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Подарочный набор</title>
     <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> <!-- Подключение библиотеки QRCode.js -->
     <style>
         body {
             background: linear-gradient(to right, #fbc2eb, #a6c0fe);
@@ -163,19 +162,7 @@
                 <p id="error-message" class="text-center"></p>
             </section>
         </div>
-        <section aria-label="Карта с QR-кодом">
-            <div class="container">
-                <article>
-                    <hgroup>
-                        <h2>Ваш QR-код</h2>
-                        <h3>Сканируйте для получения подарка</h3>
-                    </hgroup>
-                    <div id="qrcode" style="display: none;"></div>
-                    <button class="btn btn-custom" id="copy-button" onclick="copyQRCode()" style="display: none;">Скопировать QR-код</button>
-                    <p id="copy-message" class="text-center"></p>
-                </article>
-            </div>
-        </section>
+        <canvas id="cardCanvas" width="800" height="600"></canvas>
     </main>
     <footer class="container">
         <small>Спасибо, что выбрали наш подарок! Надеемся, что он принесет вам радость! • <a href="#">Политика конфиденциальности</a> • <a href="#">Условия использования</a></small>
@@ -221,63 +208,27 @@
             }
         }
 
-        function generateCard() {
-            const totalTokens = 15;
-            let totalSelectedTokens = 0;
-            let errorMessage = '';
+function generateCard() {
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.style.display = 'block';
+    
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            try {
-                for (const [code, count] of Object.entries(optionCounts)) {
-                    totalSelectedTokens += count * optionCosts[code];
-                }
+    ctx.fillStyle = '#333';
+    ctx.font = '30px Arial';
+    ctx.fillText('Ваш подарок:', 20, 40);
 
-                console.log("Всего выбрано токенов:", totalSelectedTokens);
-                console.log("Оставшиеся токены:", tokens);
-
-                if (totalSelectedTokens < totalTokens) {
-                    errorMessage = 'Нужно потратить все токены!';
-                } else {
-                    let qrData = [];
-                    for (const [code, count] of Object.entries(optionCounts)) {
-                        if (count > 0) {
-                            qrData.push(`${code}:${count}`);
-                        }
-                    }
-
-                    document.getElementById('qrcode').style.display = 'block';
-                    document.getElementById('copy-button').style.display = 'block';
-                    document.getElementById('qrcode').innerHTML = '';
-
-                    new QRCode(document.getElementById('qrcode'), {
-                        text: qrData.join(', '),
-                        width: 128,
-                        height: 128,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.L
-                    });
-
-                    tokens = totalTokens;
-                    optionCounts = {
-                        'KI': 0,
-                        'KB': 0,
-                        'IP': 0,
-                        'TT': 0
-                    };
-                    updateOptionDisplays();
-                }
-
-                if (errorMessage) {
-                    showError(errorMessage);
-                } else {
-                    document.getElementById('error-message').style.display = 'none';
-                }
-            } catch (error) {
-                console.error(error);
-                showError('Ой, что-то пошло не так, обратитесь к поздравителю :)');
-            }
+    let y = 80;
+    for (const [code, count] of Object.entries(optionCounts)) {
+        if (count > 0) {
+            ctx.font = '20px Arial';
+            ctx.fillText(`${code}: ${count}`, 20, y);
+            y += 40;
         }
-
+    }
+}
         function showError(message) {
             document.getElementById('error-message').innerText = message;
             document.getElementById('error-message').style.display = 'block';
@@ -291,35 +242,7 @@
             }
         }
 
-        function copyQRCode() {
-            const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
-                canvas.toBlob(function(blob) {
-                    const clipboardItem = new ClipboardItem({ 'image/png': blob });
-                    navigator.clipboard.write([clipboardItem]).then(() => {
-                        showCopyMessage();
-                    }).catch(err => {
-                        showCopyMessage('Не удалось скопировать QR-код. Попробуйте вручную.');
-                    });
-                });
-            } else {
-                showCopyMessage('QR-код еще не сгенерирован.');
-            }
-        }
 
-        function showCopyMessage(message = 'QR-код скопирован в буфер обмена!') {
-            const copyMessageElement = document.getElementById('copy-message');
-            copyMessageElement.innerText = message;
-            copyMessageElement.style.display = 'block';
-            copyMessageElement.style.opacity = 1;
-            
-            setTimeout(() => {
-                copyMessageElement.style.opacity = 0;
-                setTimeout(() => {
-                    copyMessageElement.style.display = 'none';
-                }, 300);
-            }, 2000);
-        }
     </script>
 </body>
 </html>
