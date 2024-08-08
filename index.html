@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Подарочный набор</title>
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> <!-- Подключение библиотеки QRCode.js -->
+    <style>
+        body {
+            background: linear-gradient(to right, #fbc2eb, #a6c0fe);
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .card-custom {
+            border: 1px solid #ff6f61;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-custom {
+            background-color: #ff6f61;
+            color: #fff;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #ff4d4d;
+        }
+        .btn-small {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        #error-message, #copy-message {
+            color: #d9534f;
+            transition: opacity 0.3s ease;
+        }
+        #copy-message {
+            color: #5bc0de;
+        }
+        .header-text {
+            color: #fff;
+            text-align: center;
+        }
+        .header-text h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .header-text p {
+            font-size: 1.25rem;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            background-color: #ff6f61;
+            border-radius: 10px;
+        }
+        #qrcode {
+            text-align: center;
+        }
+        main.container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .option-block {
+            margin-bottom: 1.5rem;
+        }
+        .option-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .option-block .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .option-block .btn-group .btn {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul><li><strong>Подарочный набор</strong></li></ul>
+        <ul>
+            <li><a href="#home">Главная</a></li>
+            <li><a href="#options">Опции</a></li>
+            <li><a href="#card" role="button">Карта</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="header-text mb-4">
+            <h1>С Днём Рождения!</h1>
+            <p>У тебя есть 15 токенов. Выбери, на что их потратить, и получи свой уникальный подарок!</p>
+            <figure>
+                <img src="https://files.oaiusercontent.com/file-rMObyYFcTpNkDX4yh6RWCgB4?se=2024-08-08T17%3A03%3A30Z&sp=r&sv=2023-11-03&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3Dd54176cd-6fb2-48e7-9727-e2ff0f24a5ed.webp&sig=CUSMITFnIOzq5e8dj25I88bThtOI/LjPLmxmnh7fbq0%3D" alt="Birthday celebration">
+                <figcaption>Праздничное изображение</figcaption>
+            </figure>
+        </div>
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>Выбери опцию</h2>
+                    <h3>и получи свой подарок</h3>
+                </hgroup>
+                <div class="grid">
+                    <div class="option-block">
+                        <figure>
+                            <img src="https://files.oaiusercontent.com/file-hnAe7y4hDEw75hPJp3MQ0WE2?se=2024-08-08T17%3A03%3A30Z&sp=r&sv=2023-11-03&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D7c8b4829-a3a6-43b9-8d7b-c83beb3ecac6.webp&sig=7RpP75RzuBZovg3fjcIhAKdUg41Db9Rc0iJxl7n6IxU%3D" alt="Cinema">
+                            <figcaption>Кино - 1 токен</figcaption>
+                        </figure>
+                        <div class="btn-group">
+                            <button class="btn btn-small btn-custom" onclick="selectOption('Кино', 1, 'KI')">Добавить</button>
+                            <button class="btn btn-small btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
+                            <span id="count-KI">0</span>
+                        </div>
+                    </div>
+                    <div class="option-block">
+                        <figure>
+                            <img src="https://files.oaiusercontent.com/file-d7BxNWqEOiDlDcUHRZThZplD?se=2024-08-08T17%3A03%3A30Z&sp=r&sv=2023-11-03&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D6066bb71-e0a7-4a0c-9b8b-a74ef6514126.webp&sig=ooypUJGngSaBdouy2mrlgmC3IJJ7TWZtnAIp06zdScw%3D" alt="Cocktail">
+                            <figcaption>Коктейль в баре - 1 токен</figcaption>
+                        </figure>
+                        <div class="btn-group">
+                            <button class="btn btn-small btn-custom" onclick="selectOption('Коктейль в баре', 1, 'KB')">Добавить</button>
+                            <button class="btn btn-small btn-custom" onclick="deselectOption('Коктейль в баре', 1, 'KB')">Убрать</button>
+                            <span id="count-KB">0</span>
+                        </div>
+                    </div>
+                    <div class="option-block">
+                        <figure>
+                            <img src="https://files.oaiusercontent.com/file-QvRRDvyMdCpIQgugz0ugNw1b?se=2024-08-08T17%3A03%3A30Z&sp=r&sv=2023-11-03&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D70e9d49c-e4e0-4bc8-8523-4214fd8ce631.webp&sig=fZujdyPtHYA9pVmqjYEVSKwgDL91rpXyh2albXGmH6U%3D" alt="Paddle game">
+                            <figcaption>Игра в паддл - 3 токена</figcaption>
+                        </figure>
+                        <div class="btn-group">
+                            <button class="btn btn-small btn-custom" onclick="selectOption('Игра в паддл', 3, 'IP')">Добавить</button>
+                            <button class="btn btn-small btn-custom" onclick="deselectOption('Игра в паддл', 3, 'IP')">Убрать</button>
+                            <span id="count-IP">0</span>
+                        </div>
+                    </div>
+                    <div class="option-block">
+                        <figure>
+                            <img src="https://files.oaiusercontent.com/file-QbQiSsEOF2q0Dq3OmXMOe8wu?se=2024-08-08T17%3A03%3A30Z&sp=r&sv=2023-11-03&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3Dff7f1459-3cd5-41c5-bfb2-48e1fc8f9fbb.webp&sig=mMBDmaD2xXI9J7Sfrp5NbcNEXBYdlq0Orh2oAKFC%2Bd0%3D" alt="Tennis lesson">
+                            <figcaption>Занятие с тренером по теннису - 7 токенов</figcaption>
+                        </figure>
+                        <div class="btn-group">
+                            <button class="btn btn-small btn-custom" onclick="selectOption('Занятие с тренером по теннису', 7, 'TT')">Добавить</button>
+                            <button class="btn btn-small btn-custom" onclick="deselectOption('Занятие с тренером по теннису', 7, 'TT')">Убрать</button>
+                            <span id="count-TT">0</span>
+                        </div>
+                    </div>
+                </div>
+                <p id="remaining-tokens" class="text-center">Оставшиеся токены: 15</p>
+                <button class="btn btn-success btn-lg" onclick="generateCard()">Создать карточку</button>
+                <p id="error-message" class="text-center"></p>
+            </section>
+        </div>
+        <section aria-label="Карта с QR-кодом">
+            <div class="container">
+                <article>
+                    <hgroup>
+                        <h2>Ваш QR-код</h2>
+                        <h3>Сканируйте для получения подарка</h3>
+                    </hgroup>
+                    <div id="qrcode" style="display: none;"></div>
+                    <button class="btn btn-custom" id="copy-button" onclick="copyQRCode()" style="display: none;">Скопировать QR-код</button>
+                    <p id="copy-message" class="text-center"></p>
+                </article>
+            </div>
+        </section>
+    </main>
+    <footer class="container">
+        <small>Спасибо, что выбрали наш подарок! Надеемся, что он принесет вам радость! • <a href="#">Политика конфиденциальности</a> • <a href="#">Условия использования</a></small>
+    </footer>
+
+    <script>
+        let tokens = 15;
+        let optionCounts = {
+            'KI': 0,
+            'KB': 0,
+            'IP': 0,
+            'TT': 0
+        };
+
+        const optionCosts = {
+            'KI': 1,
+            'KB': 1,
+            'IP': 3,
+            'TT': 7
+        };
+
+        function selectOption(option, cost, code) {
+            if (tokens >= cost) {
+                tokens -= cost;
+                optionCounts[code] = (optionCounts[code] || 0) + 1;
+                document.getElementById('remaining-tokens').innerText = 'Оставшиеся токены: ' + tokens;
+                document.getElementById('count-' + code).innerText = optionCounts[code];
+                document.getElementById('error-message').style.display = 'none';
+            } else {
+                showError('Недостаточно токенов для выбора этой опции.');
+            }
+        }
+
+        function deselectOption(option, cost, code) {
+            if (optionCounts[code] > 0) {
+                tokens += cost;
+                optionCounts[code] = (optionCounts[code] || 0) - 1;
+                document.getElementById('remaining-tokens').innerText = 'Оставшиеся токены: ' + tokens;
+                document.getElementById('count-' + code).innerText = optionCounts[code];
+                document.getElementById('error-message').style.display = 'none';
+            } else {
+                showError('Эту опцию нельзя убрать.');
+            }
+        }
+
+        function generateCard() {
+            const totalTokens = 15;
+            let totalSelectedTokens = 0;
+            let errorMessage = '';
+
+            try {
+                for (const [code, count] of Object.entries(optionCounts)) {
+                    totalSelectedTokens += count * optionCosts[code];
+                }
+
+                console.log("Всего выбрано токенов:", totalSelectedTokens);
+                console.log("Оставшиеся токены:", tokens);
+
+                if (totalSelectedTokens < totalTokens) {
+                    errorMessage = 'Нужно потратить все токены!';
+                } else {
+                    let qrData = [];
+                    for (const [code, count] of Object.entries(optionCounts)) {
+                        if (count > 0) {
+                            qrData.push(`${code}:${count}`);
+                        }
+                    }
+
+                    document.getElementById('qrcode').style.display = 'block';
+                    document.getElementById('copy-button').style.display = 'block';
+                    document.getElementById('qrcode').innerHTML = '';
+
+                    new QRCode(document.getElementById('qrcode'), {
+                        text: qrData.join(', '),
+                        width: 128,
+                        height: 128,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+
+                    tokens = totalTokens;
+                    optionCounts = {
+                        'KI': 0,
+                        'KB': 0,
+                        'IP': 0,
+                        'TT': 0
+                    };
+                    updateOptionDisplays();
+                }
+
+                if (errorMessage) {
+                    showError(errorMessage);
+                } else {
+                    document.getElementById('error-message').style.display = 'none';
+                }
+            } catch (error) {
+                console.error(error);
+                showError('Ой, что-то пошло не так, обратитесь к поздравителю :)');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').innerText = message;
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('copy-button').style.display = 'none';
+        }
+
+        function updateOptionDisplays() {
+            for (const [code, count] of Object.entries(optionCounts)) {
+                document.getElementById('count-' + code).innerText = count;
+            }
+        }
+
+        function copyQRCode() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                canvas.toBlob(function(blob) {
+                    const clipboardItem = new ClipboardItem({ 'image/png': blob });
+                    navigator.clipboard.write([clipboardItem]).then(() => {
+                        showCopyMessage();
+                    }).catch(err => {
+                        showCopyMessage('Не удалось скопировать QR-код. Попробуйте вручную.');
+                    });
+                });
+            } else {
+                showCopyMessage('QR-код еще не сгенерирован.');
+            }
+        }
+
+        function showCopyMessage(message = 'QR-код скопирован в буфер обмена!') {
+            const copyMessageElement = document.getElementById('copy-message');
+            copyMessageElement.innerText = message;
+            copyMessageElement.style.display = 'block';
+            copyMessageElement.style.opacity = 1;
+            
+            setTimeout(() => {
+                copyMessageElement.style.opacity = 0;
+                setTimeout(() => {
+                    copyMessageElement.style.display = 'none';
+                }, 300);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
