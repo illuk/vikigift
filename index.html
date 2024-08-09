@@ -89,6 +89,10 @@
             font-weight: normal;
             margin-top: 5px;
         }
+        .grid section {
+            margin-bottom: 0; /* Убираем нижний отступ */
+            padding-bottom: 0; /* Если padding тоже не нужен */
+        }
         .card-wrapper {
             position: relative;
             width: 100%;
@@ -110,7 +114,7 @@
         /* Стили для QR-кода */
         #qrcode {
             width: 29.3%;
-            /* padding-top: 29.3%; /* Обеспечивает соотношение сторон 1:1 */
+            padding-top: 0; /* Обеспечивает соотношение сторон 1:1 */
             position: absolute;
             top: 35.4%;
             left: 35.4%;
@@ -197,7 +201,7 @@
             }
             #qrcode {
                 width: 29.3%;
-                /* padding-top: 29.3%; /* Сохраняем квадратное соотношение */
+                padding-top: 0; /* Сохраняем квадратное соотношение */
                 top: 35.4%;
                 left: 35.4%;
             }
