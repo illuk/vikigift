@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Подарочная открытка с QR-кодом</title>
+    <title>Подарок Вике</title>
     <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
     <style>
         /* Основные стили */
@@ -190,11 +190,12 @@
 <body>
     <main class="container">
         <div class="header-text">
-            <h1>С Днём Рождения!</h1>
+            <h1>Вика, с Днём Рождения!</h1>
             <figure>
                 <img src="images/bd.jpg" alt="Поздравление" class="header-image">
             </figure>
-            <p>Доступно токенов: <span id="remaining-tokens">15</span></p>
+            <p>Выбери свой набор подарков, они все связаны с времяпровождением с друзьями! Ты выбираешь - я организую! :) </p>
+            <p>У тебя вот столько токенов, которые ты можешь потратить на подерки: <span id="remaining-tokens">15</span></p>
         </div>
 
         <div class="grid">
@@ -254,7 +255,9 @@
                 <button class="btn btn-success btn-lg" id="generateButton" onclick="generateCard()">Создать карточку</button>
             </section>
         </div>
-        <div id="cardResult" style="text-align:center; margin-top:10px;"></div>
+        <div id="cardResult" style="text-align:center; margin-top:10px;">
+            <p>Покажи мне QR код с открытки, и дальше дело за мной :)</p>
+        </div>
     </main>
 
     <!-- Подключаем библиотеку для генерации QR-кода -->
@@ -286,7 +289,7 @@
                 updateDisplay();
                 showTokenPopup();
             } else {
-                showError('Недостаточно токенов для выбора этой опции.');
+                showError('Упс, токены закончились ;(');
             }
         }
 
@@ -297,7 +300,7 @@
                 updateDisplay();
                 showTokenPopup();
             } else {
-                showError('Эту опцию нельзя убрать.');
+                showError('Ты хочешь выбрать меньше нуля? Обратно дарить нельзя! :)');
             }
         }
 
@@ -310,7 +313,7 @@
 
         function generateCard() {
             if (tokens > 0) {
-                showError('Не все токены потрачены. Используйте их, чтобы продолжить.');
+                showError('У тебя еще есть токены, выбери еще что-нибудь! ;)');
                 return;
             }
 
@@ -320,7 +323,7 @@
                 .join(',');
 
             if (qrText === '') {
-                showError('Выберите хотя бы одну опцию.');
+                showError('Начни с чего-то одного, а дальше дело пойдет!');
                 return;
             }
 
@@ -343,7 +346,7 @@
 
             disableButtons(true);
             const generateButton = document.getElementById("generateButton");
-            generateButton.innerText = "Создать заново";
+            generateButton.innerText = "Начать заново";
             generateButton.setAttribute("onclick", "resetForm()");
         }
 
@@ -354,7 +357,7 @@
             document.getElementById('cardResult').innerHTML = '';
             disableButtons(false);
             const generateButton = document.getElementById("generateButton");
-            generateButton.innerText = "Создать карточку";
+            generateButton.innerText = "Создать набор";
             generateButton.setAttribute("onclick", "generateCard()");
         }
 
@@ -396,7 +399,7 @@
         }
     </script>
     <footer>
-        <p>Спасибо, что выбрали наш подарок! Надеемся, что он принесет вам радость!</p>
+        <p>Ура! Осталось договориться про даты, и идем развлекаться! :)</p>
     </footer>
 </body>
 </html>
