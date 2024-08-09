@@ -36,8 +36,8 @@
         }
         .header-image, .card-image {
             width: 100%;
+            height: auto;
             max-width: 512px;
-            height: 512px;
             display: block;
             margin: 0 auto;
             border-radius: 10px;
@@ -91,19 +91,17 @@
         }
         .card-wrapper {
             position: relative;
-            display: inline-block;
-            width: 512px;
-            height: 512px;
-            margin-top: 10px;
+            width: 100%;
+            max-width: 512px;
+            margin: 0 auto;
             text-align: center;
-            margin-bottom: 10px;
         }
         #qrcode {
             position: absolute;
-            width: 30%;
-            height: 30%;
-            top: 35%;
-            left: 35%;
+            width: 29%; /* Устанавливаем размер QR-кода относительно родителя */
+            height: auto;
+            top: 35.5%;  /* Центрирование по вертикали */
+            left: 35.5%; /* Центрирование по горизонтали */
         }
         footer {
             padding: 20px;
@@ -174,6 +172,11 @@
             .header-image, .card-wrapper, .option-block img {
                 width: 100%;
                 height: auto;
+            }
+            #qrcode {
+                width: 29%; /* Уменьшается вместе с изображением */
+                top: 35.5%;  /* Центрирование по вертикали */
+                left: 35.5%; /* Центрирование по горизонтали */
             }
         }
     </style>
