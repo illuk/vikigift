@@ -84,9 +84,9 @@
         }
         .option-selected {
             text-align: center;
-            font-size: 1.2rem;
-            color: #ff6f61;
-            font-weight: bold;
+            font-size: 1rem;
+            color: #888;
+            font-weight: normal;
             margin-top: 5px;
         }
         .card-wrapper {
@@ -107,6 +107,15 @@
             height: 29.3%;
             top: 35.4%;
             left: 35.4%;
+        }
+        #remaining-tokens-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+        #remaining-tokens {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6f61;
         }
         footer {
             padding: 20px;
@@ -195,7 +204,8 @@
                 <img src="images/bd.jpg" alt="Поздравление" class="header-image">
             </figure>
             <p>Выбери свой набор подарков, они про провождение времени со мной и другими друзьями! Ты выбираешь - я организую! :) </p>
-            <p>У тебя вот столько токенов, которые ты можешь потратить на подарки: <span id="remaining-tokens">15</span></p>
+            <p>У тебя вот столько токенов, которые ты можешь потратить на подарки:</p>
+            <p id="remaining-tokens-wrapper"><span id="remaining-tokens">15</span></p>
         </div>
 
         <div class="grid">
