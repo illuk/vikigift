@@ -333,17 +333,14 @@
         }
 
         function generateCard() {
-            // Проверяем, было ли что-то выбрано
             const hasSelection = Object.values(optionCounts).some(count => count > 0);
         
             if (!hasSelection) {
-                // Если ничего не выбрано, выводим сообщение "Начни с чего-нибудь"
                 showError('Начни с чего-нибудь, а дальше дело пойдет!');
                 return;
             }
         
             if (tokens > 0) {
-                // Если токены остались, но что-то выбрано, выводим сообщение
                 showError('У тебя еще есть токены, выбери еще что-нибудь! ;)');
                 return;
             }
@@ -359,16 +356,21 @@
                     <p>Покажи мне QR код с открытки, и дальше дело за мной :)</p>
                     <div class="image-container">
                         <img src="images/qr.jpg" alt="Праздничная рамка" class="card-image">
-                        <div id="qrcode"></div>
+                        <div id="qrcode" style="width: 150px; height: 150px;"></div>
                     </div>
                 </div>
             `;
         
-            // Генерация QR-кода
-            new QRCode(document.getElementById("qrcode"), {
+            // Установите фиксированные размеры QR-кода
+            const qrCodeContainer = document.getElementById("qrcode");
+            const qrWidth = qrCodeContainer.offsetWidth || 150;
+            const qrHeight = qrCodeContainer.offsetHeight || 150;
+        
+            // Генерация QR-кода с фиксированными размерами
+            new QRCode(qrCodeContainer, {
                 text: qrText,
-                width: document.getElementById("qrcode").offsetWidth,
-                height: document.getElementById("qrcode").offsetHeight,
+                width: qrWidth,
+                height: qrHeight,
                 colorDark: "#2a9d8f",
                 colorLight: "#ffffff"
             });
