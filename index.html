@@ -102,11 +102,12 @@
             height: auto;
         }
         #qrcode {
-            position: absolute;
             width: 29.3%;
-            height: 29.3%;
+            padding-top: 29.3%; /* Обеспечивает соотношение сторон 1:1 */
+            position: absolute;
             top: 35.4%;
             left: 35.4%;
+            transform: translate(-50%, -50%);
         }
         #remaining-tokens-wrapper {
             text-align: center;
@@ -189,7 +190,7 @@
             }
             #qrcode {
                 width: 29.3%;
-                height: 29.3%;
+                padding-top: 29.3%; /* Сохраняем квадратное соотношение */
                 top: 35.4%;
                 left: 35.4%;
             }
