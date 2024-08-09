@@ -164,39 +164,25 @@
     <main class="container">
         <div class="header-text">
             <h1>С Днём Рождения!</h1>
+            <figure>
+                <img src="images/bd.jpg" alt="Поздравление" class="header-image">
+            </figure>
             <p>Выберите опции и получите открытку с QR-кодом.</p>
         </div>
-
-        <figure>
-            <img src="images/bd.jpg" alt="Поздравление" class="header-image">
-        </figure>
 
         <div class="grid">
             <section>
                 <div class="option-block">
                     <figure>
-                        <div class="option-image option-image-cinema"></div>
+                        <div class="option-image option-image-tennis"></div>
                         <figcaption>
-                            Кино - 1 токен<br>
-                            <span id="count-KI" class="option-selected">Выбрано: 0</span>
+                            Занятие с тренером по теннису - 7 токенов<br>
+                            <span id="count-TT" class="option-selected">Выбрано: 0</span>
                         </figcaption>
                     </figure>
                     <div class="btn-group">
-                        <button class="btn-custom" onclick="selectOption('Кино', 1, 'KI')">Добавить</button>
-                        <button class="btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
-                    </div>
-                </div>
-                <div class="option-block">
-                    <figure>
-                        <div class="option-image option-image-cocktail"></div>
-                        <figcaption>
-                            Коктейль в баре - 1 токен<br>
-                            <span id="count-KB" class="option-selected">Выбрано: 0</span>
-                        </figcaption>
-                    </figure>
-                    <div class="btn-group">
-                        <button class="btn-custom" onclick="selectOption('Коктейль в баре', 1, 'KB')">Добавить</button>
-                        <button class="btn-custom" onclick="deselectOption('Коктейль в баре', 1, 'KB')">Убрать</button>
+                        <button class="btn-custom" onclick="selectOption('Занятие с тренером по теннису', 7, 'TT')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Занятие с тренером по теннису', 7, 'TT')">Убрать</button>
                     </div>
                 </div>
                 <div class="option-block">
@@ -214,15 +200,28 @@
                 </div>
                 <div class="option-block">
                     <figure>
-                        <div class="option-image option-image-tennis"></div>
+                        <div class="option-image option-image-cocktail"></div>
                         <figcaption>
-                            Занятие с тренером по теннису - 7 токенов<br>
-                            <span id="count-TT" class="option-selected">Выбрано: 0</span>
+                            Коктейль в баре - 1 токен<br>
+                            <span id="count-KB" class="option-selected">Выбрано: 0</span>
                         </figcaption>
                     </figure>
                     <div class="btn-group">
-                        <button class="btn-custom" onclick="selectOption('Занятие с тренером по теннису', 7, 'TT')">Добавить</button>
-                        <button class="btn-custom" onclick="deselectOption('Занятие с тренером по теннису', 7, 'TT')">Убрать</button>
+                        <button class="btn-custom" onclick="selectOption('Коктейль в баре', 1, 'KB')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Коктейль в баре', 1, 'KB')">Убрать</button>
+                    </div>
+                </div>
+                <div class="option-block">
+                    <figure>
+                        <div class="option-image option-image-cinema"></div>
+                        <figcaption>
+                            Кино - 1 токен<br>
+                            <span id="count-KI" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
+                    </figure>
+                    <div class="btn-group">
+                        <button class="btn-custom" onclick="selectOption('Кино', 1, 'KI')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
                     </div>
                 </div>
                 <p id="remaining-tokens" class="text-center">Оставшиеся токены: 15</p>
