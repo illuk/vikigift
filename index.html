@@ -101,13 +101,20 @@
             width: 100%;
             height: auto;
         }
+        /* Обязательно сделайте родительское изображение position: relative */
+        .image-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* Стили для QR-кода */
         #qrcode {
             width: 29.3%;
             padding-top: 29.3%; /* Обеспечивает соотношение сторон 1:1 */
             position: absolute;
             top: 35.4%;
             left: 35.4%;
-            /* transform: translate(-50%, -50%); */
+            /* transform: translate(-50%, -50%); /* Для точного центрирования QR-кода */
         }
         #remaining-tokens-wrapper {
             text-align: center;
@@ -322,30 +329,37 @@
         }
 
         function generateCard() {
+            // Проверяем, было ли что-то выбрано
+            const hasSelection = Object.values(optionCounts).some(count => count > 0);
+        
+            if (!hasSelection) {
+                // Если ничего не выбрано, выводим сообщение "Начни с чего-нибудь"
+                showError('Начни с чего-нибудь, а дальше дело пойдет!');
+                return;
+            }
+        
             if (tokens > 0) {
+                // Если токены остались, но что-то выбрано, выводим сообщение
                 showError('У тебя еще есть токены, выбери еще что-нибудь! ;)');
                 return;
             }
-
+        
             const qrText = Object.entries(optionCounts)
                 .filter(([code, count]) => count > 0)
                 .map(([code, count]) => `${code}:${count}`)
                 .join(',');
-
-            if (qrText === '') {
-                showError('Начни с чего-то одного, а дальше дело пойдет!');
-                return;
-            }
-
+        
             const cardResult = document.getElementById('cardResult');
             cardResult.innerHTML = `
                 <div class="card-wrapper">
                     <p>Покажи мне QR код с открытки, и дальше дело за мной :)</p>
-                    <img src="images/qr.jpg" alt="Праздничная рамка" class="card-image">
-                    <div id="qrcode"></div>
+                    <div class="image-container">
+                        <img src="images/qr.jpg" alt="Праздничная рамка" class="card-image">
+                        <div id="qrcode"></div>
+                    </div>
                 </div>
             `;
-
+        
             // Генерация QR-кода
             new QRCode(document.getElementById("qrcode"), {
                 text: qrText,
@@ -354,13 +368,12 @@
                 colorDark: "#2a9d8f",
                 colorLight: "#ffffff"
             });
-
+        
             disableButtons(true);
             const generateButton = document.getElementById("generateButton");
             generateButton.innerText = "Начать заново";
             generateButton.setAttribute("onclick", "resetForm()");
         }
-
         function resetForm() {
             tokens = 15;
             optionCounts = { 'KI': 0, 'KB': 0, 'IP': 0, 'TT': 0 };
