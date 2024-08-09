@@ -1,47 +1,433 @@
-<script>
-function generateCard() {
-    const hasSelection = Object.values(optionCounts).some(count => count > 0);
-
-    if (!hasSelection) {
-        showError('Начни с чего-нибудь, а дальше дело пойдет!');
-        return;
-    }
-
-    if (tokens > 0) {
-        showError('У тебя еще есть токены, выбери еще что-нибудь! ;)');
-        return;
-    }
-
-    const qrText = Object.entries(optionCounts)
-        .filter(([code, count]) => count > 0)
-        .map(([code, count]) => `${code}:${count}`)
-        .join(',');
-
-    const cardResult = document.getElementById('cardResult');
-    cardResult.innerHTML = `
-        <div class="card-wrapper">
-            <p>Покажи мне QR код с открытки, и дальше дело за мной :)</p>
-            <div class="image-container">
-                <img src="images/qr.jpg" alt="Праздничная рамка" class="card-image">
-                <div id="qrcode-container" style="position: absolute; top: 35.4%; left: 35.4%; width: 29.3%; height: 29.3%;">
-                    <div id="qrcode" style="width: 100%; height: 100%;"></div>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Подарок Вике</title>
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
+    <style>
+        /* Основные стили */
+        body {
+            background: linear-gradient(to right, #fbc2eb, #a6c0fe);
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto 20px auto;
+            padding: 20px;
+            flex: 1;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header-text {
+            text-align: center;
+            color: #ff6f61;
+            margin-bottom: 20px;
+        }
+        .header-text h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .header-image, .card-image {
+            width: 100%;
+            max-width: 512px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+        .option-block {
+            margin-bottom: 20px;
+        }
+        .option-block figure {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .option-block img, .option-block .option-image {
+            width: 100%;
+            height: 512px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            margin: 0 auto 10px auto;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .btn-group .btn-custom {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #ff6f61;
+            color: #fff;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-group .btn-custom:hover {
+            background-color: #ff4d4d;
+        }
+        .btn-group .btn-custom:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .option-selected {
+            text-align: center;
+            font-size: 1rem;
+            color: #888;
+            font-weight: normal;
+            margin-top: 5px;
+        }
+        .grid section {
+            margin-bottom: 0; /* Убираем нижний отступ */
+            padding-bottom: 0; /* Если padding тоже не нужен */
+        }
+        .card-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 512px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .card-wrapper img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        /* Обязательно сделайте родительское изображение position: relative */
+        .image-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* Стили для QR-кода */
+        #qrcode {
+            width: 29.3%;
+            padding-top: 0; /* Обеспечивает соотношение сторон 1:1 */
+            position: absolute;
+            top: 35.4%;
+            left: 35.4%;
+            /* transform: translate(-50%, -50%); /* Для точного центрирования QR-кода */
+        }
+        #remaining-tokens-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+        #remaining-tokens {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6f61;
+        }
+        footer {
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            background-color: #ff6f61;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        /* Всплывающее сообщение об ошибке */
+        .error-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d9534f;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+        /* Всплывающее сообщение о количестве токенов */
+        .token-popup {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #5bc0de;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+        /* Пути к изображениям опций */
+        .option-image-cinema {
+            background-image: url('images/ki.jpg');
+        }
+        .option-image-cocktail {
+            background-image: url('images/kb.jpg');
+        }
+        .option-image-paddle {
+            background-image: url('images/ip.jpg');
+        }
+        .option-image-tennis {
+            background-image: url('images/tt.jpg');
+        }
+        /* Адаптация под мобильные устройства */
+        @media (max-width: 600px) {
+            .header-text h1 {
+                font-size: 2rem;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn-custom {
+                margin: 5px 0;
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            .header-image, .card-wrapper, .option-block img {
+                width: 100%;
+                height: auto;
+            }
+            #qrcode {
+                width: 29.3%;
+                padding-top: 0; /* Сохраняем квадратное соотношение */
+                top: 35.4%;
+                left: 35.4%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="header-text">
+            <h1>Вика, с Днём Рождения!</h1>
+            <figure>
+                <img src="images/bd.jpg" alt="Поздравление" class="header-image">
+            </figure>
+            <p>Выбери свой набор подарков, они про провождение времени со мной и другими друзьями! Ты выбираешь - я организую! :) </p>
+            <p>У тебя вот столько токенов, которые ты можешь потратить на подарки:</p>
+            <p id="remaining-tokens-wrapper"><span id="remaining-tokens">15</span></p>
         </div>
-    `;
 
-    // Генерация QR-кода с использованием 100% размеров родительского контейнера
-    new QRCode(document.getElementById("qrcode"), {
-        text: qrText,
-        width: document.getElementById("qrcode").offsetWidth,
-        height: document.getElementById("qrcode").offsetHeight,
-        colorDark: "#2a9d8f",
-        colorLight: "#ffffff"
-    });
+        <div class="grid">
+            <section>
+                <div class="option-block">
+                    <figure>
+                        <div class="option-image option-image-tennis"></div>
+                        <figcaption>
+                            Занятие с тренером по теннису - 7 токенов<br>
+                            <span id="count-TT" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
+                    </figure>
+                    <div class="btn-group">
+                        <button class="btn-custom" onclick="selectOption('Занятие с тренером по теннису', 7, 'TT')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Занятие с тренером по теннису', 7, 'TT')">Убрать</button>
+                    </div>
+                </div>
+                <div class="option-block">
+                    <figure>
+                        <div class="option-image option-image-paddle"></div>
+                        <figcaption>
+                            Игра в паддл - 3 токена<br>
+                            <span id="count-IP" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
+                    </figure>
+                    <div class="btn-group">
+                        <button class="btn-custom" onclick="selectOption('Игра в паддл', 3, 'IP')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Игра в паддл', 3, 'IP')">Убрать</button>
+                    </div>
+                </div>
+                <div class="option-block">
+                    <figure>
+                        <div class="option-image option-image-cocktail"></div>
+                        <figcaption>
+                            Коктейль в баре - 1 токен<br>
+                            <span id="count-KB" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
+                    </figure>
+                    <div class="btn-group">
+                        <button class="btn-custom" onclick="selectOption('Коктейль в баре', 1, 'KB')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Коктейль в баре', 1, 'KB')">Убрать</button>
+                    </div>
+                </div>
+                <div class="option-block">
+                    <figure>
+                        <div class="option-image option-image-cinema"></div>
+                        <figcaption>
+                            Кино - 1 токен<br>
+                            <span id="count-KI" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
+                    </figure>
+                    <div class="btn-group">
+                        <button class="btn-custom" onclick="selectOption('Кино', 1, 'KI')">Добавить</button>
+                        <button class="btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-lg" id="generateButton" onclick="generateCard()">Создать карточку</button>
+            </section>
+        </div>
+        <div id="cardResult" style="text-align:center; margin-top:10px;">
+        </div>
+    </main>
 
-    disableButtons(true);
-    const generateButton = document.getElementById("generateButton");
-    generateButton.innerText = "Начать заново";
-    generateButton.setAttribute("onclick", "resetForm()");
-}
-</script>
+    <!-- Подключаем библиотеку для генерации QR-кода -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        let tokens = 15;
+        let optionCounts = {
+            'KI': 0,
+            'KB': 0,
+            'IP': 0,
+            'TT': 0
+        };
+
+        const optionCosts = {
+            'KI': 1,
+            'KB': 1,
+            'IP': 3,
+            'TT': 7
+        };
+
+        // Предварительная загрузка изображения для рамки QR-кода
+        const qrFrameImage = new Image();
+        qrFrameImage.src = "images/qr.jpg";
+
+        function selectOption(option, cost, code) {
+            if (tokens >= cost) {
+                tokens -= cost;
+                optionCounts[code] = (optionCounts[code] || 0) + 1;
+                updateDisplay();
+                showTokenPopup();
+            } else {
+                showError('Упс, токены закончились ;(');
+            }
+        }
+
+        function deselectOption(option, cost, code) {
+            if (optionCounts[code] > 0) {
+                tokens += cost;
+                optionCounts[code] = (optionCounts[code] || 0) - 1;
+                updateDisplay();
+                showTokenPopup();
+            } else {
+                showError('Ты хочешь выбрать меньше нуля? Обратно дарить нельзя! :)');
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('remaining-tokens').innerText = tokens;
+            for (const [code, count] of Object.entries(optionCounts)) {
+                document.getElementById('count-' + code).innerText = 'Выбрано: ' + count;
+            }
+        }
+
+        function generateCard() {
+            const hasSelection = Object.values(optionCounts).some(count => count > 0);
+        
+            if (!hasSelection) {
+                showError('Начни с чего-нибудь, а дальше дело пойдет!');
+                return;
+            }
+        
+            if (tokens > 0) {
+                showError('У тебя еще есть токены, выбери еще что-нибудь! ;)');
+                return;
+            }
+        
+            const qrText = Object.entries(optionCounts)
+                .filter(([code, count]) => count > 0)
+                .map(([code, count]) => `${code}:${count}`)
+                .join(',');
+        
+            const cardResult = document.getElementById('cardResult');
+            cardResult.innerHTML = `
+                <div class="card-wrapper">
+                    <p>Покажи мне QR код с открытки, и дальше дело за мной :)</p>
+                    <div class="image-container">
+                        <img src="images/qr.jpg" alt="Праздничная рамка" class="card-image">
+                        <div id="qrcode-container" style="position: absolute; top: 35.4%; left: 35.4%; width: 29.3%; height: 29.3%;">
+                            <div id="qrcode" style="width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        
+            // Генерация QR-кода с использованием 100% размеров родительского контейнера
+            new QRCode(document.getElementById("qrcode"), {
+                text: qrText,
+                width: document.getElementById("qrcode").offsetWidth,
+                height: document.getElementById("qrcode").offsetHeight,
+                colorDark: "#2a9d8f",
+                colorLight: "#ffffff"
+            });
+        
+            disableButtons(true);
+            const generateButton = document.getElementById("generateButton");
+            generateButton.innerText = "Начать заново";
+            generateButton.setAttribute("onclick", "resetForm()");
+        }
+        
+        function resetForm() {
+            tokens = 15;
+            optionCounts = { 'KI': 0, 'KB': 0, 'IP': 0, 'TT': 0 };
+            updateDisplay();
+            document.getElementById('cardResult').innerHTML = '';
+            disableButtons(false);
+            const generateButton = document.getElementById("generateButton");
+            generateButton.innerText = "Создать набор";
+            generateButton.setAttribute("onclick", "generateCard()");
+        }
+
+        function disableButtons(disabled) {
+            const buttons = document.querySelectorAll('.btn-custom');
+            buttons.forEach(button => button.disabled = disabled);
+        }
+
+        function showError(message) {
+            const errorPopup = document.createElement('div');
+            errorPopup.className = 'error-popup';
+            errorPopup.innerText = message;
+            document.body.appendChild(errorPopup);
+
+            errorPopup.style.display = 'block';
+
+            setTimeout(() => {
+                errorPopup.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(errorPopup);
+                }, 2000);
+            }, 2000); 
+        }
+
+        function showTokenPopup() {
+            const tokenPopup = document.createElement('div');
+            tokenPopup.className = 'token-popup';
+            tokenPopup.innerText = `Осталось токенов: ${tokens}`;
+            document.body.appendChild(tokenPopup);
+
+            tokenPopup.style.display = 'block';
+
+            setTimeout(() => {
+                tokenPopup.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(tokenPopup);
+                }, 1000);
+            }, 1000);
+        }
+    </script>
+    <footer>
+        <p>Ура! Осталось договориться про даты - и идем развлекаться! :)</p>
+    </footer>
+</body>
+</html>
