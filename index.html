@@ -60,7 +60,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Уменьшенный отступ */
         }
         .btn-group .btn-custom {
             flex: 1;
@@ -87,9 +87,9 @@
         .card-wrapper {
             position: relative;
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 10px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             width: 512px;
             height: 512px;
         }
@@ -110,6 +110,22 @@
             background-color: #ff6f61;
             border-radius: 10px;
             margin-top: 20px;
+        }
+        /* Всплывающее сообщение об ошибке */
+        .error-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d9534f;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 2s ease;
         }
         /* Пути к изображениям опций */
         .option-image-cinema {
@@ -148,21 +164,23 @@
     <main class="container">
         <div class="header-text">
             <h1>С Днём Рождения!</h1>
+            <p>Выберите опции и получите открытку с QR-кодом.</p>
+        </div>
 
         <figure>
             <img src="images/bd.jpg" alt="Поздравление" class="header-image">
         </figure>
 
-            <p>Выберите опции и получите открытку с QR-кодом.</p>
-        </div>
         <div class="grid">
             <section>
                 <div class="option-block">
                     <figure>
                         <div class="option-image option-image-cinema"></div>
-                        <figcaption>Кино - 1 токен</figcaption>
+                        <figcaption>
+                            Кино - 1 токен<br>
+                            <span id="count-KI" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
                     </figure>
-                    <p id="count-KI" class="option-selected">Выбрано: 0</p>
                     <div class="btn-group">
                         <button class="btn-custom" onclick="selectOption('Кино', 1, 'KI')">Добавить</button>
                         <button class="btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
@@ -171,9 +189,11 @@
                 <div class="option-block">
                     <figure>
                         <div class="option-image option-image-cocktail"></div>
-                        <figcaption>Коктейль в баре - 1 токен</figcaption>
+                        <figcaption>
+                            Коктейль в баре - 1 токен<br>
+                            <span id="count-KB" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
                     </figure>
-                    <p id="count-KB" class="option-selected">Выбрано: 0</p>
                     <div class="btn-group">
                         <button class="btn-custom" onclick="selectOption('Коктейль в баре', 1, 'KB')">Добавить</button>
                         <button class="btn-custom" onclick="deselectOption('Коктейль в баре', 1, 'KB')">Убрать</button>
@@ -182,9 +202,11 @@
                 <div class="option-block">
                     <figure>
                         <div class="option-image option-image-paddle"></div>
-                        <figcaption>Игра в паддл - 3 токена</figcaption>
+                        <figcaption>
+                            Игра в паддл - 3 токена<br>
+                            <span id="count-IP" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
                     </figure>
-                    <p id="count-IP" class="option-selected">Выбрано: 0</p>
                     <div class="btn-group">
                         <button class="btn-custom" onclick="selectOption('Игра в паддл', 3, 'IP')">Добавить</button>
                         <button class="btn-custom" onclick="deselectOption('Игра в паддл', 3, 'IP')">Убрать</button>
@@ -193,9 +215,11 @@
                 <div class="option-block">
                     <figure>
                         <div class="option-image option-image-tennis"></div>
-                        <figcaption>Занятие с тренером по теннису - 7 токенов</figcaption>
+                        <figcaption>
+                            Занятие с тренером по теннису - 7 токенов<br>
+                            <span id="count-TT" class="option-selected">Выбрано: 0</span>
+                        </figcaption>
                     </figure>
-                    <p id="count-TT" class="option-selected">Выбрано: 0</p>
                     <div class="btn-group">
                         <button class="btn-custom" onclick="selectOption('Занятие с тренером по теннису', 7, 'TT')">Добавить</button>
                         <button class="btn-custom" onclick="deselectOption('Занятие с тренером по теннису', 7, 'TT')">Убрать</button>
@@ -203,10 +227,9 @@
                 </div>
                 <p id="remaining-tokens" class="text-center">Оставшиеся токены: 15</p>
                 <button class="btn btn-success btn-lg" id="generateButton" onclick="generateCard()">Создать карточку</button>
-                <p id="error-message" class="text-center" style="color: red;"></p>
             </section>
         </div>
-        <div id="cardResult" style="text-align:center; margin-top:20px;"></div>
+        <div id="cardResult" style="text-align:center; margin-top:10px;"></div>
     </main>
 
     <!-- Подключаем библиотеку для генерации QR-кода -->
@@ -256,7 +279,6 @@
             for (const [code, count] of Object.entries(optionCounts)) {
                 document.getElementById('count-' + code).innerText = 'Выбрано: ' + count;
             }
-            document.getElementById('error-message').innerText = '';
         }
 
         function generateCard() {
@@ -297,7 +319,19 @@
         }
 
         function showError(message) {
-            document.getElementById('error-message').innerText = message;
+            const errorPopup = document.createElement('div');
+            errorPopup.className = 'error-popup';
+            errorPopup.innerText = message;
+            document.body.appendChild(errorPopup);
+
+            errorPopup.style.display = 'block';
+
+            setTimeout(() => {
+                errorPopup.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(errorPopup);
+                }, 2000);
+            }, 2000);  // 2 секунды на показ перед началом исчезновения
         }
     </script>
     <footer>
