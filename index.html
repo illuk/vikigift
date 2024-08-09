@@ -35,7 +35,8 @@
             font-weight: bold;
         }
         .header-image, .card-image {
-            width: 512px;
+            width: 100%;
+            max-width: 512px;
             height: 512px;
             display: block;
             margin: 0 auto;
@@ -49,7 +50,7 @@
             text-align: center;
         }
         .option-block img, .option-block .option-image {
-            width: 512px;
+            width: 100%;
             height: 512px;
             background-size: cover;
             background-position: center;
@@ -60,7 +61,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px; /* Уменьшенный отступ */
+            margin-bottom: 10px;
         }
         .btn-group .btn-custom {
             flex: 1;
@@ -77,6 +78,10 @@
         .btn-group .btn-custom:hover {
             background-color: #ff4d4d;
         }
+        .btn-group .btn-custom:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
         .option-selected {
             text-align: center;
             font-size: 1.2rem;
@@ -87,21 +92,18 @@
         .card-wrapper {
             position: relative;
             display: inline-block;
+            width: 512px;
+            height: 512px;
             margin-top: 10px;
             text-align: center;
             margin-bottom: 10px;
-            width: 512px;
-            height: 512px;
         }
         #qrcode {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            max-width: 150px;
-            max-height: 150px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            width: 30%;
+            height: 30%;
+            top: 35%;
+            left: 35%;
         }
         footer {
             padding: 20px;
@@ -118,6 +120,22 @@
             left: 50%;
             transform: translateX(-50%);
             background-color: #d9534f;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+        /* Всплывающее сообщение о количестве токенов */
+        .token-popup {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #5bc0de;
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
@@ -167,7 +185,7 @@
             <figure>
                 <img src="images/bd.jpg" alt="Поздравление" class="header-image">
             </figure>
-            <p>Выберите опции и получите открытку с QR-кодом.</p>
+            <p>Доступно токенов: <span id="remaining-tokens">15</span></p>
         </div>
 
         <div class="grid">
@@ -224,7 +242,6 @@
                         <button class="btn-custom" onclick="deselectOption('Кино', 1, 'KI')">Убрать</button>
                     </div>
                 </div>
-                <p id="remaining-tokens" class="text-center">Оставшиеся токены: 15</p>
                 <button class="btn btn-success btn-lg" id="generateButton" onclick="generateCard()">Создать карточку</button>
             </section>
         </div>
@@ -258,6 +275,7 @@
                 tokens -= cost;
                 optionCounts[code] = (optionCounts[code] || 0) + 1;
                 updateDisplay();
+                showTokenPopup();
             } else {
                 showError('Недостаточно токенов для выбора этой опции.');
             }
@@ -268,26 +286,25 @@
                 tokens += cost;
                 optionCounts[code] = (optionCounts[code] || 0) - 1;
                 updateDisplay();
+                showTokenPopup();
             } else {
                 showError('Эту опцию нельзя убрать.');
             }
         }
 
         function updateDisplay() {
-            document.getElementById('remaining-tokens').innerText = 'Оставшиеся токены: ' + tokens;
+            document.getElementById('remaining-tokens').innerText = tokens;
             for (const [code, count] of Object.entries(optionCounts)) {
                 document.getElementById('count-' + code).innerText = 'Выбрано: ' + count;
             }
         }
 
         function generateCard() {
-            // Проверка на использование всех токенов
             if (tokens > 0) {
                 showError('Не все токены потрачены. Используйте их, чтобы продолжить.');
                 return;
             }
 
-            // Получаем выбранные опции и их количество
             const qrText = Object.entries(optionCounts)
                 .filter(([code, count]) => count > 0)
                 .map(([code, count]) => `${code}:${count}`)
@@ -298,7 +315,6 @@
                 return;
             }
 
-            // Создание контейнера для QR-кода
             const cardResult = document.getElementById('cardResult');
             cardResult.innerHTML = `
                 <div class="card-wrapper">
@@ -307,7 +323,6 @@
                 </div>
             `;
 
-            // Генерация QR-кода
             new QRCode(document.getElementById("qrcode"), {
                 text: qrText,
                 width: 150,
@@ -315,6 +330,27 @@
                 colorDark: "#2a9d8f",
                 colorLight: "#ffffff"
             });
+
+            disableButtons(true);
+            const generateButton = document.getElementById("generateButton");
+            generateButton.innerText = "Создать заново";
+            generateButton.setAttribute("onclick", "resetForm()");
+        }
+
+        function resetForm() {
+            tokens = 15;
+            optionCounts = { 'KI': 0, 'KB': 0, 'IP': 0, 'TT': 0 };
+            updateDisplay();
+            document.getElementById('cardResult').innerHTML = '';
+            disableButtons(false);
+            const generateButton = document.getElementById("generateButton");
+            generateButton.innerText = "Создать карточку";
+            generateButton.setAttribute("onclick", "generateCard()");
+        }
+
+        function disableButtons(disabled) {
+            const buttons = document.querySelectorAll('.btn-custom');
+            buttons.forEach(button => button.disabled = disabled);
         }
 
         function showError(message) {
@@ -330,7 +366,23 @@
                 setTimeout(() => {
                     document.body.removeChild(errorPopup);
                 }, 2000);
-            }, 2000);  // 2 секунды на показ перед началом исчезновения
+            }, 2000); 
+        }
+
+        function showTokenPopup() {
+            const tokenPopup = document.createElement('div');
+            tokenPopup.className = 'token-popup';
+            tokenPopup.innerText = `Осталось токенов: ${tokens}`;
+            document.body.appendChild(tokenPopup);
+
+            tokenPopup.style.display = 'block';
+
+            setTimeout(() => {
+                tokenPopup.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(tokenPopup);
+                }, 1000);
+            }, 1000);
         }
     </script>
     <footer>
