@@ -103,11 +103,10 @@
         }
         #qrcode {
             position: absolute;
-            width: 30%;
-            height: 30%;
-            top: 35%;
-            left: 35%;
-            transform: translate(-50%, -50%);
+            width: 29.3%;
+            height: 29.3%;
+            top: 35.4%;
+            left: 35.4%;
         }
         footer {
             padding: 20px;
@@ -180,11 +179,10 @@
                 height: auto;
             }
             #qrcode {
-                width: 30%;
-                height: auto;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+                width: 29.3%;
+                height: 29.3%;
+                top: 35.4%;
+                left: 35.4%;
             }
         }
     </style>
@@ -334,10 +332,11 @@
                 </div>
             `;
 
+            // Генерация QR-кода
             new QRCode(document.getElementById("qrcode"), {
                 text: qrText,
-                width: "100%",
-                height: "100%",
+                width: document.getElementById("qrcode").offsetWidth,
+                height: document.getElementById("qrcode").offsetHeight,
                 colorDark: "#2a9d8f",
                 colorLight: "#ffffff"
             });
