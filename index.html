@@ -34,11 +34,12 @@
             font-size: 2.5rem;
             font-weight: bold;
         }
-        .header-image {
-            max-width: 100%;
-            height: auto;
+        .header-image, .card-image {
+            width: 512px;
+            height: 512px;
+            display: block;
+            margin: 0 auto;
             border-radius: 10px;
-            margin-bottom: 20px;
         }
         .option-block {
             margin-bottom: 20px;
@@ -89,12 +90,8 @@
             margin-top: 20px;
             text-align: center;
             margin-bottom: 20px;
-        }
-        .card-image {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
+            width: 512px;
+            height: 512px;
         }
         #qrcode {
             position: absolute;
@@ -140,6 +137,10 @@
                 padding: 10px;
                 font-size: 0.9rem;
             }
+            .header-image, .card-wrapper, .option-block img {
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
@@ -147,13 +148,13 @@
     <main class="container">
         <div class="header-text">
             <h1>С Днём Рождения!</h1>
-            <p>Выберите опции и получите открытку с QR-кодом.</p>
-        </div>
 
         <figure>
             <img src="images/bd.jpg" alt="Поздравление" class="header-image">
         </figure>
 
+            <p>Выберите опции и получите открытку с QR-кодом.</p>
+        </div>
         <div class="grid">
             <section>
                 <div class="option-block">
@@ -286,25 +287,12 @@
             `;
 
             // Генерация QR-кода
-            const qrCodeElement = document.getElementById("qrcode");
-            new QRCode(qrCodeElement, {
+            new QRCode(document.getElementById("qrcode"), {
                 text: qrText,
-                width: qrCodeElement.clientWidth,
-                height: qrCodeElement.clientHeight,
+                width: 150,
+                height: 150,
                 colorDark: "#2a9d8f",
                 colorLight: "#ffffff"
-            });
-
-            // Обновление размеров QR-кода при изменении размера окна
-            window.addEventListener('resize', () => {
-                qrCodeElement.innerHTML = ""; // Очистить предыдущий QR-код
-                new QRCode(qrCodeElement, {
-                    text: qrText,
-                    width: qrCodeElement.clientWidth,
-                    height: qrCodeElement.clientHeight,
-                    colorDark: "#2a9d8f",
-                    colorLight: "#ffffff"
-                });
             });
         }
 
